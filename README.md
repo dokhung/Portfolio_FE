@@ -6,14 +6,15 @@ React・TypeScript・Vite・React Router・Axios・Tailwind CSS v4で作成し�
 
 ## 起動と確認
 
-`frontend` ディレクトリで実行します。
+このフォルダー単独でGit管理・チェックアウト・起動できます。親フォルダーの設定には依存しません。以下のコマンドは、このREADMEがあるディレクトリで実行します。`.env` のコピーはファイルがない初回のみ行い、既存の設定を上書きしないでください。
 
 ```sh
+cp .env.example .env
 npm install
 npm run dev
 ```
 
-開発サーバーは `http://localhost:3000/` で起動します。
+開発サーバーは `http://localhost:<FRONTEND_PORT>/` で起動します。ポートは、このフォルダーの `.env` の `FRONTEND_PORT` で指定します。
 
 ```sh
 npm run build   # 型チェックと本番用ファイルの生成（dist）
@@ -55,11 +56,11 @@ import { ContactPage } from './pages/ContactPage'
 
 ## バックエンドとの接続準備
 
-Spring Bootのバックエンドは `../backend` にあります。起動方法とローカルPostgreSQLの設定は、[バックエンドのREADME](../backend/README.md)を参照してください。
+Spring Bootのバックエンドは、別のGitリポジトリとして管理できます。バックエンド側のREADMEに従って起動し、フロントエンドの `.env` に接続先を設定します。バックエンドの設定ファイルやDB接続情報は、このリポジトリには不要です。
 
-開発サーバーでは、`http://localhost:3000/api/...` へのリクエストを `http://127.0.0.1:8080/api/...` に転送します。`src/lib/api.ts` の `apiClient` は、ベースURL `/api`、タイムアウト10秒、JSONレスポンスの受け取りを共通設定しています。
+開発サーバーでは、`http://localhost:<FRONTEND_PORT>/api/...` へのリクエストを `http://<BACKEND_HOST>:<BACKEND_PORT>/api/...` に転送します。`src/lib/api.ts` の `apiClient` は、ベースURL `/api`、タイムアウト10秒、JSONレスポンスの受け取りを共通設定しています。
 
-転送先のポートはルートの `.env` の `BACKEND_PORT` に合わせます。環境変数 `BACKEND_PORT` を指定した場合はそちらを優先し、未指定時は `8080` を使用します。変更後はViteの開発サーバーを再起動してください。
+開発サーバーの `FRONTEND_PORT`、API転送先の `BACKEND_HOST`・`BACKEND_PORT` は、このフォルダーの `.env` から読み込みます。`BACKEND_HOST`・`BACKEND_PORT` は、実際に起動するバックエンドの接続先に合わせてください。プロセスに同名の環境変数を指定した場合はそちらを優先します。`npm run dev`・`npm run preview` では、これらにコード内の既定値がないため、すべて設定してください。本番用の `npm run build` では、この開発サーバー用設定は不要です。これらの設定はViteのサーバー側でのみ使用します。変更後はViteの開発サーバーを再起動してください。
 
 現在は接続のための設定のみで、業務用のAPIエンドポイントや取得処理はありません。制作物の一覧は引き続き `src/data/portfolio.ts` のローカルデータを使用します。画面を開いてもバックエンドへのリクエストは発生しません。
 
@@ -75,7 +76,18 @@ const projects = response.data
 
 この場合の呼び出し先は `/api/projects` です。`Project[]` はレスポンスが制作物の配列で返る場合の型指定です。実際のAPIの項目名・構造に合わせて型と取得処理を調整してください。型指定だけでは、受け取ったデータの内容は検証されません。
 
-ベースURLを変更する場合は、`frontend/.env.example` を `frontend/.env.local` にコピーし、`VITE_API_BASE_URL` を設定して開発サーバーを再起動します。未設定または空文字の場合は `/api` を使用します。`VITE_` で始まる環境変数はブラウザーに公開されるため、秘密情報は記載しないでください。
+このフォルダーの `.env` には、次の項目を設定します。
+
+| 変数 | 用途 |
+| --- | --- |
+| `VITE_API_BASE_URL` | ブラウザーに公開するAPIのベースURL（通常は `/api`） |
+| `FRONTEND_PORT` | 開発サーバー・プレビューのポート |
+| `BACKEND_HOST` | 開発用APIプロキシの転送先ホスト |
+| `BACKEND_PORT` | 開発用APIプロキシの転送先ポート |
+
+`VITE_API_BASE_URL` が未設定または空文字の場合は `/api` を使用します。`VITE_` で始まる環境変数はブラウザーに公開されるため、DB情報やパスワードは記載しないでください。DB接続用の `.env` はバックエンド側だけで管理します。
+
+実際の `.env`・`.env.*` は、このフォルダーの `.gitignore` でGit管理から除外し、共有用の `.env.example` だけをコミットします。個別のGitリポジトリにアップする場合も、`.gitignore` と `.env.example` を含めてください。
 
 Viteのプロキシ設定は `npm run dev` 用です。本番公開時は、公開先で `/api` をバックエンドへ転送し、フロントエンドのページURLを `index.html` に戻す設定が必要です。別オリジンのAPIを使用する場合は、ビルド時に `VITE_API_BASE_URL=https://APIのホスト名/api` を設定し、バックエンドのCORS設定でフロントエンドの公開先を許可してください。
 
