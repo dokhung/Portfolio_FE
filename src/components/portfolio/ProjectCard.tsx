@@ -1,14 +1,10 @@
-import type { Project, ProjectStatus } from '../../data/portfolio'
+import { Link } from 'react-router'
+import type { Project } from '../../data/portfolio'
 import { ArrowIcon } from '../ui/ArrowIcon'
-
-const statusStyles: Record<ProjectStatus, string> = {
-  制作中: 'border-[#e9d5b6] bg-[#f7efdf] text-[#79602e]',
-  公開中: 'border-[#cad9cb] bg-[#eaf0e8] text-[#415e42]',
-  制作完了: 'border-line bg-white/50 text-muted',
-}
+import { ProjectStatusBadge } from './ProjectStatusBadge'
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const hasLinks = Boolean(project.url || project.repositoryUrl)
+  const hasLinks = Boolean(project.path || project.url || project.repositoryUrl)
 
   return (
     <li className="border-b border-line py-7 sm:py-8">
@@ -32,7 +28,13 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
             )}
             <div className="min-w-0">
               <p className="mb-2 text-xs text-muted">{project.category}</p>
-              <h3 className="text-xl leading-snug font-semibold tracking-[-0.025em] sm:text-2xl">{project.title}</h3>
+              <h3 className="text-xl leading-snug font-semibold tracking-[-0.025em] sm:text-2xl">
+                {project.path ? (
+                  <Link className="decoration-accent underline-offset-6 transition-colors hover:text-accent hover:underline" to={project.path}>
+                    {project.title}
+                  </Link>
+                ) : project.title}
+              </h3>
               <p className="mt-3 max-w-2xl text-sm leading-[1.9] text-muted [overflow-wrap:anywhere]">{project.description}</p>
             </div>
           </div>
@@ -74,11 +76,14 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         </div>
 
         <div className="flex flex-wrap items-center gap-3 lg:flex-col lg:items-stretch">
-          <span className={'inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-[11px] lg:mb-2 lg:self-end ' + statusStyles[project.status]}>
-            {project.status}
-          </span>
+          <ProjectStatusBadge status={project.status} className="lg:mb-2 lg:self-end" />
           {hasLinks && (
             <div className="flex flex-wrap gap-2 lg:flex-col" role="group" aria-label={project.title + 'のリンク'}>
+              {project.path && (
+                <Link className="inline-flex min-h-11 items-center justify-between gap-4 rounded-sm bg-ink px-4 py-2.5 text-xs text-paper transition-colors hover:bg-accent" to={project.path} aria-label={project.title + 'の作品ページを開く'}>
+                  作品を開く<span aria-hidden="true">→</span>
+                </Link>
+              )}
               {project.url && (
                 <a className="inline-flex min-h-11 items-center justify-between gap-4 rounded-sm bg-ink px-4 py-2.5 text-xs text-paper transition-colors hover:bg-accent" href={project.url} target="_blank" rel="noopener noreferrer">
                   サイトを見る<ArrowIcon /><span className="sr-only">（新しいタブで開きます）</span>

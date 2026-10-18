@@ -1,8 +1,8 @@
 # Web Portfolio
 
-React・TypeScript・Vite・React Router・Axios・Tailwind CSS v4で作成した、日本語のポートフォリオ一覧ページです。採用担当者が制作物の概要・担当範囲・使用技術を確認できる構成になっています。
+React・TypeScript・Vite・React Router・Axios・Tailwind CSS v4で作成した、日本語のポートフォリオサイトです。採用担当者が一覧で制作物の概要・担当範囲・使用技術を確認し、作品名や「作品を開く」から実際の作品ページへ移動できる構成になっています。
 
-初期データには、現在制作中のこのポートフォリオサイトだけを登録しています。架空の制作実績は含めていません。現時点では公開デプロイを行っていません。
+初期データには、今後制作する予定の「ToDoリスト」を「企画中」として登録しています。現在は作品ページの枠だけを用意しており、ToDo機能は未実装です。完成した制作実績としては扱っていません。現時点では公開デプロイを行っていません。
 
 ## 起動と確認
 
@@ -28,12 +28,22 @@ npm run lint    # コードの静的チェック
 src/
 ├── main.tsx                         # BrowserRouterでアプリ全体を囲む
 ├── App.tsx                          # URLとページの対応を定義
-├── layouts/SiteLayout.tsx            # 共通ヘッダー・フッターとOutlet
-├── pages/PortfolioPage.tsx           # 制作物の一覧ページ
+├── layouts/SiteLayout.tsx            # 共通ヘッダー・フッターとページを組み合わせる
+├── layouts/ProjectLayout.tsx         # URLから作品情報を選び、上部バーの表示状態と作品枠を管理
+├── pages/PortfolioPage.tsx           # 一覧用の紹介文とリストを組み合わせる
 ├── pages/AboutPage.tsx               # 自己紹介ページ（本文は空欄）
 ├── pages/NotFoundPage.tsx            # 存在しないURLの案内
-├── components/projects/ProjectList.tsx # 一覧・絞り込み結果の表示
-├── components/projects/ProjectCard.tsx # 各制作物の表示
+├── projects/todo-list/               # ToDoリストの作品専用フォルダー
+│   └── TodoListPage.tsx              # ToDo機能の実装先（現在は空のコンポーネント）
+├── components/portfolio/             # 作品を掲載するための共通UI
+│   ├── PortfolioHeader.tsx           # ポートフォリオのヘッダー・ナビゲーション
+│   ├── PortfolioFooter.tsx           # ポートフォリオのフッター
+│   ├── PortfolioIntro.tsx            # 一覧ページの見出し・紹介文・掲載数
+│   ├── ProjectList.tsx              # カテゴリーの絞り込み・一覧表示
+│   ├── ProjectCard.tsx              # 各制作物の概要とリンク
+│   ├── ProjectStatusBadge.tsx       # 作品の制作状況
+│   ├── ProjectToolbar.tsx           # 戻るリンク・作品名・状態と、バーの表示切り替え
+│   └── ProjectPageFrame.tsx         # 余白を設けない全幅の作品本体の領域
 ├── components/ui/ArrowIcon.tsx       # 共通アイコン
 ├── data/portfolio.ts                # プロフィール・制作物のローカルデータ
 ├── lib/api.ts                       # 共通のAxiosクライアント
@@ -41,9 +51,17 @@ src/
 └── index.css                        # Tailwind CSS・テーマ
 ```
 
-`/` に制作物の一覧、`/about` に自己紹介を表示し、定義されていないURLには案内ページを表示します。ヘッダーの「制作実績」「自己紹介」から各ページへ移動できます。自己紹介は一覧ページから分離し、本文は空欄にしています。
+`/` に制作物の一覧、`/about` に自己紹介、`/projects/todo-list` にToDoリストの作品ページを表示し、定義されていないURLには案内ページを表示します。ヘッダーの「制作実績」「自己紹介」から各ページへ移動できます。自己紹介は一覧ページから分離し、本文は空欄にしています。
 
-React Routerの機能は `react-router` から読み込みます。ページ間の移動には `Link` または `NavLink` を使用し、`SiteLayout` の `Outlet` に各ページを表示します。
+作品ページには独立した `ProjectLayout` を使い、画面の横幅と高さを広く使って作品本体を表示します。`ProjectLayout` が現在のURLに一致する `projects` データを選び、`ProjectToolbar` と `ProjectPageFrame` を組み合わせます。上部バーには一覧へ戻るリンクと小さな作品名・制作状況を表示します。本文には共通の大きな見出しや外側の余白を設けず、上部バーの直下から全幅で作品を表示します。
+
+上部バーの「バーを隠す」を押すと、バーの領域がなくなり、作品本体をブラウザーの全幅・全高で表示できます。非表示中は右上の小さな「バーを表示」ボタンで元に戻せます。切り替えても作品本体は再マウントしないため、入力中の内容など、作品のコンポーネントが持つ状態を維持します。バーの表示状態は `ProjectLayout` が管理し、`ProjectToolbar` は操作UIを担当します。状態は保存せず、ページの再読み込みや一覧に戻ってからの再入場時はバーを表示します。
+
+`src/projects/todo-list/TodoListPage.tsx` は、ToDo機能を実装するための空のコンポーネントです。ここに制作するToDoリストのコンポーネントを配置してください。掲載用の作品名と「企画中」は上部バーに表示するため、作品本体の見出し・余白・UIは各作品に合わせて実装できます。タスクの登録・編集・削除・保存処理やToDo用APIは、まだ実装していません。
+
+作品は `src/projects/<作品名>/` に1作品ずつまとめます。作品専用のコンポーネントや画像は、その中に必要に応じて `components/`・`assets/` を作って配置します。作品を掲載するための共通UIは `src/components/portfolio/`、汎用アイコンなどは `src/components/ui/` に配置してください。ポートフォリオの枠と作品本体を分けることで、作品側では制作する機能だけを実装できます。
+
+React Routerの機能は `react-router` から読み込みます。ページ間の移動には `Link` または `NavLink` を使用します。一覧・自己紹介などのポートフォリオ内のページは `SiteLayout` の `Outlet`、`/projects/` 配下の作品本体は `ProjectLayout` の `Outlet` に表示します。
 
 新しいページを追加する場合は、例えば `src/pages/ContactPage.tsx` を作成し、`src/App.tsx` に読み込みとルートを追加します。
 
@@ -93,7 +111,30 @@ Viteのプロキシ設定は `npm run dev` 用です。本番公開時は、公�
 
 ## プロジェクトの追加・編集
 
-`src/data/portfolio.ts` の `projects` 配列を編集します。APIによる取得処理を実装するまでは、この配列の順序が表示順になります。
+作品をこのサイト内で表示する場合は、作品ページのコンポーネント・URLのルート・一覧データの3つを追加します。`projects` 配列にデータを追加するだけでは、作品本体の画面は作成されません。
+
+1. 作品専用フォルダー `src/projects/my-project/` を作り、その中に `MyProjectPage.tsx` を作成します。ページ本体に実装するか、同じ作品フォルダーのコンポーネントを表示します。
+
+   ```tsx
+   import { MyProject } from './components/MyProject'
+
+   export function MyProjectPage() {
+     return <MyProject />
+   }
+   ```
+
+   この例では `src/projects/my-project/components/MyProject.tsx` に `MyProject` を作成します。名前やインポート先は、自分の制作物に合わせて変更してください。
+
+2. `src/App.tsx` でページを読み込み、`ProjectLayout` を指定した `Route` の中にルートを追加します。作品ページの `path` は `projects/作品名` として指定します。
+
+   ```tsx
+   import { MyProjectPage } from './projects/my-project/MyProjectPage'
+
+   // <Route element={<ProjectLayout />}> の中に追加します。
+   <Route path="projects/my-project" element={<MyProjectPage />} />
+   ```
+
+3. `src/data/portfolio.ts` の `projects` 配列に作品を追加し、`path` に上で登録したURLを設定します。このデータの `title`・`status` は、一覧と作品ページの上部バーの両方で使います。作品コンポーネント内に掲載用のタイトル・制作状況・戻るリンクを追加する必要はありません。APIによる取得処理を実装するまでは、この配列の順序が表示順になります。
 
 次のオブジェクトを配列の末尾に追加し、実際の制作内容に書き換えてください。`satisfies Project` により、入力内容を型チェックできます。
 
@@ -107,16 +148,18 @@ Viteのプロキシ設定は `npm run dev` 用です。本番公開時は、公�
   tags: ['実際に使用した技術'],
   period: '制作期間を記入します。',
   status: '制作中',
+  path: '/projects/my-project',
 } satisfies Project,
 ```
 
 - `id` はプロジェクトごとに異なる値にします。
-- `category` は `Webサイト`・`アプリ`・`その他`、`status` は `制作中`・`公開中`・`制作完了` から選びます。
+- `category` は `Webサイト`・`アプリ`・`その他`、`status` は `企画中`・`制作中`・`公開中`・`制作完了` から選びます。
+- `path` はこのサイト内に登録した作品ページのURLです。設定すると作品名と「作品を開く」から移動できます。サイト内に作品ページを用意しない場合は省略してください。
 - `url` は公開サイト、`repositoryUrl` はソースコードの実際のURLです。未公開の場合は項目自体を省略してください。対応するリンクは表示されません。
 - `highlights` は実装した機能や工夫した点を文字列の配列で追加できます。省略すると表示されません。
-- `image` は任意です。画像を `public/projects/name.webp` に置き、`image: '/projects/name.webp'` と指定します。画像には遅延読み込みを使用し、省略時は画像欄を表示しません。
+- `image` は任意です。作品フォルダーの `assets/` に置いた画像を `src/data/portfolio.ts` でインポートし、`image` に指定できます（例：`import myProjectImage from '../projects/my-project/assets/preview.webp'`、`image: myProjectImage`）。画像には遅延読み込みを使用し、省略時は画像欄を表示しません。
 
-公開や制作完了のタイミングで、現在のポートフォリオサイトの `status`・期間・リンクも更新してください。
+ToDoリストの実装を始めたら `status` を `制作中` に更新し、実際の担当範囲・使用技術・期間を記入してください。実装した内容に合わせて `highlights` を追加し、公開や制作完了のタイミングで `status`・リンクも更新してください。
 
 ## プロフィールとサイト情報
 
@@ -125,8 +168,10 @@ Viteのプロキシ設定は `npm run dev` 用です。本番公開時は、公�
 - `email`・`githubUrl` は任意です。空文字の場合、対応するリンクを表示しません。
 - `index.html` の `title` と `meta description` を自分の紹介に合わせて変更します。
 - ファビコンは `public/favicon.svg` を差し替えるか、`index.html` のアイコンパスを変更します。
-- URLの設定は `src/App.tsx`、一覧ページの構成は `src/pages/PortfolioPage.tsx`、自己紹介ページの構成は `src/pages/AboutPage.tsx`、共通ヘッダー・フッターは `src/layouts/SiteLayout.tsx` で変更します。
-- 制作物の表示は `src/components/projects/ProjectList.tsx` と `ProjectCard.tsx`、色やフォントは `src/index.css` で変更します。
+- URLの設定は `src/App.tsx`、一覧ページの組み合わせは `src/pages/PortfolioPage.tsx`、自己紹介ページの構成は `src/pages/AboutPage.tsx` で変更します。`src/layouts/SiteLayout.tsx` と `ProjectLayout.tsx` は、共通UIと各ページを組み合わせる役割です。
+- ヘッダー・フッター・一覧の紹介文は `src/components/portfolio/` の `PortfolioHeader.tsx`・`PortfolioFooter.tsx`・`PortfolioIntro.tsx` で変更します。
+- 制作物の一覧表示は同フォルダーの `ProjectList.tsx`・`ProjectCard.tsx`、制作状況の表示は `ProjectStatusBadge.tsx` で変更します。作品本体の全幅レイアウトは `ProjectPageFrame.tsx`、上部バーの戻るリンク・作品名・状態・表示切り替えのUIは `ProjectToolbar.tsx`、表示状態の管理は `ProjectLayout.tsx` で変更します。
+- 作品そのものの機能・画面は `src/projects/<作品名>/`、サイト全体の色やフォントは `src/index.css` で変更します。
 
 ## Tailwind CSS
 

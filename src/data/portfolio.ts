@@ -2,7 +2,7 @@ export const categories = ['すべて', 'Webサイト', 'アプリ', 'その他'
 
 export type Category = (typeof categories)[number]
 
-export type ProjectStatus = '制作中' | '公開中' | '制作完了'
+export type ProjectStatus = '企画中' | '制作中' | '公開中' | '制作完了'
 
 export type Project = {
   id: string
@@ -13,6 +13,7 @@ export type Project = {
   tags: string[]
   period: string
   status: ProjectStatus
+  path?: string
   url?: string
   repositoryUrl?: string
   image?: string
@@ -21,16 +22,16 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    id: 'portfolio-website',
-    title: 'ポートフォリオサイト',
+    id: 'todo-list',
+    title: 'ToDoリスト',
     description:
-      '制作物を一覧で紹介するポートフォリオサイトです。各プロジェクトの概要・担当範囲・使用技術・関連リンクを整理しています。',
-    category: 'Webサイト',
-    role: '画面設計・フロントエンド実装',
+      'タスクを管理するToDoリストを企画しています。現在は制作内容の検討と、作品ページの準備を進めています。',
+    category: 'アプリ',
+    role: '企画・画面設計',
     tags: ['React', 'TypeScript', 'Tailwind CSS', 'Vite'],
-    period: '2026年10月〜',
-    status: '制作中',
-    highlights: ['画面幅に応じたレスポンシブ表示', 'カテゴリーによるプロジェクトの絞り込み'],
+    period: '未定',
+    status: '企画中',
+    path: '/projects/todo-list',
   },
 ]
 
@@ -38,7 +39,7 @@ export const profile = {
   name: 'odo.',
   headline: '制作プロジェクト',
   introduction:
-    '制作物の概要・担当範囲・使用技術をまとめています。\n公開中の作品には、サイトやソースコードへのリンクを掲載します。',
+    '制作物の概要・担当範囲・使用技術をまとめています。\n作品名や「作品を開く」から、制作したページをご覧いただけます。',
   about: '',
   email: '',
   githubUrl: '',
