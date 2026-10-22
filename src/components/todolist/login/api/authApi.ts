@@ -3,7 +3,7 @@ import type {LoginResponseDTO} from "../dto/LoginResponseDTO.ts";
 import type {AxiosInstance, AxiosResponse} from "axios";
 import {axiosClient} from "../../../../api/axiosClient.ts";
 
-export class AuthApi {
+export default class AuthApi {
 
     private readonly client: AxiosInstance;
 

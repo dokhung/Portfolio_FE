@@ -1,6 +1,6 @@
-import {AuthApi} from "../api/authApi.ts";
 import type {LoginRequestDTO} from "../dto/LoginRequestDTO.ts";
 import type {LoginResponseDTO} from "../dto/LoginResponseDTO.ts";
+import AuthApi from "../api/authApi.ts";
 
 export class AuthService {
     private readonly authApi: AuthApi;
