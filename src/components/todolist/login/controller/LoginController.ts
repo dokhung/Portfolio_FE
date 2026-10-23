@@ -2,6 +2,8 @@ import {type Dispatch, type SetStateAction, useState} from "react";
 import {type NavigateFunction, useNavigate} from "react-router";
 import type {LoginRequestDTO} from "../dto/LoginRequestDTO.ts";
 import {authService} from "../service/AuthService.ts";
+import {useDispatch} from "react-redux";
+import {loginSuccess} from "../../store/authSlice.ts";
 
 type LoginControllerState = {
     nickName : string;
@@ -18,6 +20,7 @@ type LoginControllerState = {
 
 export default function useLoginController(): LoginControllerState {
     const navigate:NavigateFunction = useNavigate();
+    const dispatch = useDispatch();
 
     const [nickName, setNickName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -35,6 +38,7 @@ export default function useLoginController(): LoginControllerState {
             };
 
             await authService.loginAsync(req);
+            dispatch(loginSuccess(nickName));
             navigate("/dashboard", { replace: true });
 
         } catch {
