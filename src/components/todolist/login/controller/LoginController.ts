@@ -4,6 +4,7 @@ import type {LoginRequestDTO} from "../dto/LoginRequestDTO.ts";
 import {authService} from "../service/AuthService.ts";
 import {useDispatch} from "react-redux";
 import {loginSuccess} from "../../store/authSlice.ts";
+import type {UnknownAction} from "@reduxjs/toolkit";
 
 type LoginControllerState = {
     nickName : string;
@@ -20,7 +21,7 @@ type LoginControllerState = {
 
 export default function useLoginController(): LoginControllerState {
     const navigate:NavigateFunction = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch :Dispatch<UnknownAction> = useDispatch();
 
     const [nickName, setNickName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
