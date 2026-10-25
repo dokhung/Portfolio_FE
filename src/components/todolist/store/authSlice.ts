@@ -14,6 +14,7 @@ const authSlice = createSlice({
     name: "todoAuth",
     initialState,
     reducers: {
+
         loginSuccess: (state: AuthState, action: PayloadAction<string>): void => {
             state.isLoggedIn = true;
             state.nickName = action.payload;
